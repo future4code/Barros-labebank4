@@ -39,6 +39,14 @@ app.post("/users", (req: Request, res: Response) => {
             }
         })
 
+        const birthDateArray = dateOfBirth.split("/").map(Number)
+        let minimumBirthDate = new Date(birthDateArray[2] + 18, birthDateArray[1] - 1, birthDateArray[0])
+        let today = new Date()
+        if (minimumBirthDate > today) {
+            errorCode = 404
+            throw new Error("Idade mínima de 18 anos não alcançada.");
+        }
+
         const newUser = {
             name,
             cpf,
