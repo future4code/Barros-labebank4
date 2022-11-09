@@ -3,5 +3,11 @@ export type UserAccount = {
     cpf: string,
     dateOfBirth: string,
     balance: number,
-    statement: object[]
+    statement: Statement[]
+}
+
+export type Statement = {
+    value: number,
+    date: string,
+    description: string
 }
