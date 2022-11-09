@@ -18,17 +18,17 @@ app.post("/users", (req: Request, res: Response) => {
     try {
 
         if (!name) {
-            errorCode = 404
+            errorCode = 422
             throw new Error("Informe o seu nome completo.");
         }
 
         if (!cpf) {
-            errorCode = 404
+            errorCode = 422
             throw new Error("Informe o seu CPF.");
         }
 
         if (!dateOfBirth) {
-            errorCode = 404
+            errorCode = 422
             throw new Error("Informe a sua data de nascimento no padrão DD/MM/AAAA.");
         }
 
@@ -43,7 +43,7 @@ app.post("/users", (req: Request, res: Response) => {
         let minimumBirthDate = new Date(birthDateArray[2] + 18, birthDateArray[1] - 1, birthDateArray[0])
         let today = new Date()
         if (minimumBirthDate > today) {
-            errorCode = 404
+            errorCode = 403
             throw new Error("Idade mínima de 18 anos não alcançada.");
         }
 
