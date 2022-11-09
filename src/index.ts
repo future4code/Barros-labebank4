@@ -1,5 +1,6 @@
 import express, {Response, Request} from 'express'
 import cors from 'cors'
+import { userAccounts } from './data'
 
 const app = express()
 app.use(express.json())
@@ -8,6 +9,51 @@ app.use(cors())
 //Teste
 app.get("/teste", (req: Request, res: Response) => {
     res.status(400).send('Teste')
+})
+
+app.post("/users", (req: Request, res: Response) => {
+    const {name, cpf, dateOfBirth} = req.body
+    let errorCode = 400
+
+    try {
+
+        if (!name) {
+            errorCode = 404
+            throw new Error("Informe o seu nome completo.");
+        }
+
+        if (!cpf) {
+            errorCode = 404
+            throw new Error("Informe o seu CPF.");
+        }
+
+        if (!dateOfBirth) {
+            errorCode = 404
+            throw new Error("Informe a sua data de nascimento no padrão DD/MM/AAAA.");
+        }
+
+        userAccounts.forEach((user) => {
+            if (user.cpf === cpf) {
+                errorCode = 409
+                throw new Error("CPF já existente no banco de dados.");  
+            }
+        })
+
+        const newUser = {
+            name,
+            cpf,
+            dateOfBirth,
+            balance: 0,
+            statement: []
+        }
+
+        userAccounts.push(newUser)
+
+        res.status(201).send(newUser)
+        
+    } catch (err:any) {
+        res.status(errorCode).send(err.message)
+    }
 })
 
 
