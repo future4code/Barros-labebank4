@@ -98,9 +98,21 @@ app.post("/users/payment", (req: Request, res: Response) => {
             throw new Error("Adicione uma descrição para esta transação.");
         }
 
+        let paymentDate: string
+
+        if (!date) {
+            const today = new Date()
+            const day = today.getDate();
+            const month = (today.getMonth() > 9 ? `${today.getMonth() + 1}` : `0${today.getMonth() + 1}`);
+            const year = today.getFullYear();
+            paymentDate = `${day}/${month}/${year}`
+        } else {
+            paymentDate = date
+        }
+
         const payment = {
             value,
-            date,
+            date: paymentDate,
             description
         }
 
