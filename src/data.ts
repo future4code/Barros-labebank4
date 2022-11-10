@@ -14,8 +14,8 @@ export const userAccounts: UserAccount[] = [
     },
     {
         name: 'Giovana Inez Vieira',
-        cpf: '00577061400',
-        dateOfBirth: '20/03/1997',
+        cpf: '12345678910',
+        dateOfBirth: '01/04/1999',
         balance: 30000,
         statement: [
             {value: 50, date: '10/05/2022', description: 'Cafeteria'},
