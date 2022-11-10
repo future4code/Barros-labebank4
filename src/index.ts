@@ -64,6 +64,55 @@ app.post("/users", (req: Request, res: Response) => {
     }
 })
 
+app.post("/users/payment", (req: Request, res: Response) => {
+    const userCpf = req.headers.cpf as string
+    const {value, date, description} = req.body
+    let errorCode = 400
+
+    try {
+        
+        if (!userCpf) {
+            errorCode = 403
+            throw new Error("Informe seu CPF para continuar.");
+        }
+
+        const getUser = userAccounts.find(user => user.cpf === userCpf)
+
+        if (!getUser) {
+            errorCode = 401
+            throw new Error("Usuário não encontrado no banco de dados.");
+        }
+
+        if (value === 0) {
+            errorCode = 422
+            throw new Error("O valor da conta não pode ser nulo.");
+        }
+
+        if (value > getUser.balance) {
+            errorCode = 401
+            throw new Error("Saldo insuficiente.");
+        }
+
+        if (!description) {
+            errorCode = 422
+            throw new Error("Adicione uma descrição para esta transação.");
+        }
+
+        const payment = {
+            value,
+            date,
+            description
+        }
+
+        getUser.statement.push(payment)
+
+        res.status(201).send(getUser)
+
+    } catch (err:any) {
+        res.status(errorCode).send(err.message)
+    }
+})
+
 
 app.listen(3003, () => {
     console.log("Server is running in http://localhost:3003")
