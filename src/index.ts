@@ -7,13 +7,11 @@ app.use(express.json())
 app.use(cors())
 
 // Teste
-
 app.get("/teste", (req: Request, res: Response) => {
     res.status(400).send('Teste')
 })
 
 // Create Bank Account 
-
 app.post("/users", (req: Request, res: Response) => {
     const {name, cpf, dateOfBirth} = req.body
     let errorCode = 400
@@ -51,6 +49,7 @@ app.post("/users", (req: Request, res: Response) => {
         }
 
         const newUser = {
+            id: Date.now().toString(),
             name,
             cpf,
             dateOfBirth,
@@ -67,6 +66,7 @@ app.post("/users", (req: Request, res: Response) => {
     }
 })
 
+// Make a payment
 app.post("/users/payment", (req: Request, res: Response) => {
     const userCpf = req.headers.cpf as string
     const {value, date, description} = req.body
@@ -129,8 +129,7 @@ app.post("/users/payment", (req: Request, res: Response) => {
 })
 
 
-// "Get All Users"
-
+// Get All Users
 app.get("/users", (req: Request, res: Response)=>{
 
     let errorCode= 400
@@ -142,8 +141,8 @@ app.get("/users", (req: Request, res: Response)=>{
     }
 })
 
-// Get Account Balance
 
+// Get Account Balance
 app.get("/users/balance",(req: Request, res: Response)=>{
 
     const name = req.headers.name as string
@@ -192,8 +191,8 @@ app.get("/users/balance",(req: Request, res: Response)=>{
     }
 })
 
-// Add Balance
 
+// Add Balance
 app.patch("/users/add/balance",(req: Request, res: Response)=>{
 
     const name = req.headers.name as string
@@ -248,6 +247,67 @@ app.patch("/users/add/balance",(req: Request, res: Response)=>{
     } 
 
 })  
+
+
+// Bank transfer
+app.patch("/users/transfer", (req: Request, res: Response) => {
+    const {senderName, senderCpf, receiverName, receiverCpf, amountOfMoney} = req.body
+    let error = 400
+    
+    try {
+        if (!senderName && !senderCpf && !receiverName && !receiverCpf && !amountOfMoney) {
+            error = 422
+            throw new Error('É obrigatório fornecer o nome e o CPF do usuário que irá fazer a transferência e o nome e o CPF do usuário que irá receber a transferência.')
+        } else if (!senderName) {
+            error = 422
+            throw new Error('É obrigatório fornecer o nome do usuário que irá fazer a transferência.')
+        } else if (!senderCpf) {
+            error = 422
+            throw new Error('É obrigatório fornecer o CPF do usuário que irá fazer a transferência.')
+        } else if (!receiverName) {
+            error = 422
+            throw new Error('É obrigatório fornecer o nome do usuário que irá receber a transferência.')
+        } else if (!receiverCpf) {
+            error = 422
+            throw new Error('É obrigatório fornecer o CPF do usuário que irá receber a transferência.')
+        } else if (!amountOfMoney) {
+            error = 422
+            throw new Error('É obrigatório fornecer o valor que será transferido.')
+        }
+
+        const userThatWillTransferExists = userAccounts.filter(item => item.name === senderName && item.cpf === senderCpf)
+        if (userThatWillTransferExists.length === 0) {
+            error = 422
+            throw new Error('Os dados do usuário que irá fazer a transferência estão incorretos.')
+        }
+
+        const userThatWillReceiveExists = userAccounts.filter(item => item.name === receiverName && item.cpf === receiverCpf)
+        if (userThatWillReceiveExists.length === 0) {
+            error = 422
+            throw new Error('Os dados do usuário que irá receber a transferência estão incorretos.')
+        }
+
+        for (let user of userAccounts) {
+            if (user.name === senderName) {
+                if (user.balance >= amountOfMoney) {
+                    user.balance = user.balance - Number(amountOfMoney)
+                } else {
+                    error = 401
+                    throw new Error('Não há saldo suficiente na conta do usuário para realizar a transferência.')
+                }
+            }
+            if (user.name === receiverName) {
+                user.balance = user.balance + Number(amountOfMoney)
+            }
+        }
+
+        res.status(201).send(userAccounts)
+
+    } catch (err: any) {
+        res.status(error).send(err.message)
+    }
+})
+
 
 
 app.listen(3003, () => {

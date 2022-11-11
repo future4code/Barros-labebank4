@@ -2,6 +2,7 @@ import { UserAccount } from "./types"
 
 export const userAccounts: UserAccount[] = [
     {
+        id: '001',
         name: 'Francine Hahn',
         cpf: '00985662110',
         dateOfBirth: '04/06/1991',
@@ -13,6 +14,7 @@ export const userAccounts: UserAccount[] = [
         ]
     },
     {
+        id: '002',
         name: 'Giovana Inez Vieira',
         cpf: '12345678910',
         dateOfBirth: '01/04/1999',
@@ -25,6 +27,7 @@ export const userAccounts: UserAccount[] = [
         ]
     },
     {
+        id: '003',
         name: 'Maria Fernandez',
         cpf: '55012342910',
         dateOfBirth: '07/10/1995',
