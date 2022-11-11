@@ -11,6 +11,19 @@ app.get("/teste", (req: Request, res: Response) => {
     res.status(400).send('Teste')
 })
 
+// Get All Users
+app.get("/users", (req: Request, res: Response)=>{
+
+    let errorCode= 400
+
+    try{
+        res.status(200).send(userAccounts)
+    }catch(e: any){
+        res.status(errorCode).send(e.message)
+    }
+})
+
+
 // Create Bank Account 
 app.post("/users", (req: Request, res: Response) => {
     const {name, cpf, dateOfBirth} = req.body
@@ -120,6 +133,7 @@ app.post("/users/payment", (req: Request, res: Response) => {
         }
 
         getUser.statement.push(payment)
+        getUser.balance -= value
 
         res.status(201).send(getUser)
 
@@ -127,20 +141,6 @@ app.post("/users/payment", (req: Request, res: Response) => {
         res.status(errorCode).send(err.message)
     }
 })
-
-
-// Get All Users
-app.get("/users", (req: Request, res: Response)=>{
-
-    let errorCode= 400
-
-    try{
-        res.status(200).send(userAccounts)
-    }catch(e: any){
-        res.status(errorCode).send(e.message)
-    }
-})
-
 
 // Get Account Balance
 app.get("/users/balance",(req: Request, res: Response)=>{
