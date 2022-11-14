@@ -251,13 +251,14 @@ app.patch("/users/add/balance",(req: Request, res: Response)=>{
 
 // Bank transfer
 app.patch("/users/transfer", (req: Request, res: Response) => {
-    const {senderName, senderCpf, receiverName, receiverCpf, amountOfMoney} = req.body
+    const {senderName, senderCpf, receiverName, receiverCpf, amountOfMoney, date} = req.body
+    const now = new Date().toLocaleDateString('pt-br')
     let error = 400
-    
+
     try {
-        if (!senderName && !senderCpf && !receiverName && !receiverCpf && !amountOfMoney) {
+        if (!senderName && !senderCpf && !receiverName && !receiverCpf && !amountOfMoney && !date) {
             error = 422
-            throw new Error('É obrigatório fornecer o nome e o CPF do usuário que irá fazer a transferência e o nome e o CPF do usuário que irá receber a transferência.')
+            throw new Error('É obrigatório fornecer o nome e o CPF do usuário que irá fazer a transferência, o nome e o CPF do usuário que irá receber a transferência, a quantia que será transferida e a data da transferência.')
         } else if (!senderName) {
             error = 422
             throw new Error('É obrigatório fornecer o nome do usuário que irá fazer a transferência.')
@@ -273,6 +274,9 @@ app.patch("/users/transfer", (req: Request, res: Response) => {
         } else if (!amountOfMoney) {
             error = 422
             throw new Error('É obrigatório fornecer o valor que será transferido.')
+        } else if (!date) {
+            error = 422
+            throw new Error('É obrigatório fornecer a data que a transferência será feita no formato dd/mm/aaaa.')
         }
 
         const userThatWillTransferExists = userAccounts.filter(item => item.name === senderName && item.cpf === senderCpf)
@@ -301,7 +305,33 @@ app.patch("/users/transfer", (req: Request, res: Response) => {
             }
         }
 
-        res.status(201).send(userAccounts)
+        const arrayOfTheScheduledDate = date.split('/')
+        const arrayOfTheCurrentDate = now.split('/')
+
+        if (date === new Date().toLocaleDateString('pt-br')) {
+            res.status(201).send(userAccounts)
+        } else {
+            if (Number(arrayOfTheScheduledDate[2]) > Number(arrayOfTheCurrentDate[2])) {
+                res.status(201).send('Agendamento realizado com sucesso.')
+            } else if (Number(arrayOfTheScheduledDate[2]) === Number(arrayOfTheCurrentDate[2])) {
+                if (Number(arrayOfTheScheduledDate[1]) > Number(arrayOfTheCurrentDate[1])) {
+                    res.status(201).send('Agendamento realizado com sucesso.')
+                } else if (Number(arrayOfTheScheduledDate[1]) === Number(arrayOfTheCurrentDate[1])) {
+                    if (Number(arrayOfTheScheduledDate[0]) > Number(arrayOfTheCurrentDate[0])) {
+                        res.status(201).send('Agendamento realizado com sucesso.')
+                    } else {
+                        error = 422
+                        throw new Error ('Não é possível adicionar uma data anterior ao dia atual.')
+                    }
+                } else {
+                    error = 422
+                    throw new Error ('Não é possível adicionar uma data anterior ao dia atual.')
+                }
+            } else {
+                error = 422
+                throw new Error ('Não é possível adicionar uma data anterior ao dia atual.')
+            }
+        }
 
     } catch (err: any) {
         res.status(error).send(err.message)
