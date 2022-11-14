@@ -79,6 +79,33 @@ app.post("/users", (req: Request, res: Response) => {
     }
 })
 
+
+// Delete bank account
+app.delete('/users/:id', (req: Request, res: Response) => {
+    const accountId = req.params.id
+    let error = 400
+    
+    try {
+        if(accountId === ':id') {
+            error = 422
+            throw new Error('É necessário adicionar o id da conta bancária que deseja deletar.')
+        }
+
+        const idExists = userAccounts.filter(item => item.id === accountId)
+        if(idExists.length === 0) {
+            error = 404
+            throw new Error('O id da conta bancária não existe.')
+        }
+
+        const accountsNotDeleted = userAccounts.filter(item => item.id !== accountId)
+        res.status(201).send(accountsNotDeleted)
+
+    } catch (err: any) {
+        res.status(error).send(err.message)
+    }
+})
+
+
 // Make a payment
 app.post("/users/payment", (req: Request, res: Response) => {
     const userCpf = req.headers.cpf as string
