@@ -143,14 +143,23 @@ app.post("/users/payment", (req: Request, res: Response) => {
 
         let paymentDate: string
 
+        const today = new Date()
+
         if (!date) {
-            const today = new Date()
             const day = today.getDate();
             const month = (today.getMonth() > 9 ? `${today.getMonth() + 1}` : `0${today.getMonth() + 1}`);
             const year = today.getFullYear();
             paymentDate = `${day}/${month}/${year}`
         } else {
             paymentDate = date
+        }
+
+        const informedDateArray = date.split("/").map(Number)
+        let informedDate = new Date(informedDateArray[2], informedDateArray[1] - 1, informedDateArray[0])
+
+        if (informedDate < today) {
+            errorCode = 404
+            throw new Error("Não é possível realizar pagamentos em uma data anterior ao dia de hoje.");
         }
 
         const payment = {
