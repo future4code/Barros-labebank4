@@ -229,12 +229,13 @@ app.get("/users/balance",(req: Request, res: Response)=>{
 
 
 // Add Balance
-app.patch("/users/add/balance",(req: Request, res: Response)=>{
+app.put("/users/add/balance",(req: Request, res: Response)=>{
 
     const name = req.headers.name as string
     const cpf = req.headers.cpf as string
     const valueToAdd = Number(req.body.valueToAdd)
-    let newUserBalance
+    let userBalance
+    let userAdd 
     let errorCode= 400
 
     try{
@@ -272,11 +273,19 @@ app.patch("/users/add/balance",(req: Request, res: Response)=>{
 
         for(let user of userAccounts){
             if(user.name.toLowerCase() === name.toLowerCase() && user.cpf === cpf){
-               newUserBalance = user.balance + valueToAdd
+               user.balance = user.balance + valueToAdd
+               userBalance = user.balance
+               user.statement.push({
+                value: valueToAdd, 
+                date: new Date().toString(), 
+                description: 'Depósito de dinheiro'
+               })
+               userAdd = user.statement[user.statement.length -1]
             }
         }
 
-        res.status(200).send(`${newUserBalance}`)  
+        res.status(200).send(`${userAdd?.date}
+        O saldo foi adicionado com sucesso! Seu novo saldo é: ${userBalance}.`) 
 
     }catch(e: any){
         res.status(errorCode).send(e.message)
