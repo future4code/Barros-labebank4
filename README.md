@@ -1,7 +1,7 @@
 <h1 align="center">LabeBank 🏦</h1>
 
 ##  ℹ️About
-API REST developed with the objective of simulating a banking system with several functionalities as part of fixing the content about TypeScript, Node.js and the framework Express learned in Labenu's Full Stack Web Development bootcamp. CRUD (Create, Read, Update and Delete) requests were built respecting the semantics and organization necessary for the elaboration of an API with RESTful principles.
+API REST developed with the objective of simulating a banking system with several functionalities as part of fixing the content about Node.js, TypeScript and the framework Express learned in Labenu's Full Stack Web Development bootcamp. CRUD (Create, Read, Update and Delete) requests were built respecting the semantics and organization necessary for the elaboration of an API with RESTful principles.
 
 ##  👩‍💻Developers
 - <a href="https://github.com/francinehahn" target="_blank"><p>Francine Hahn</p></a>
@@ -28,6 +28,6 @@ https://documenter.getpostman.com/view/22370553/2s8YmNQiDM
 4. npm run start
 
 ## 💻Technologies
+- Node.js
 - TypeScript
 - Express
-- Node.js
